@@ -10,8 +10,8 @@ python main.py --data <src>
 
 ## TODOs
 
-- [ ] Implement data ingestion workflow
-- [ ] Define basic RNN/LSTM architecture and model
+- [x] Implement data ingestion workflow
+- [x] Define basic RNN/LSTM architecture and model
 - [ ] Implement model training
 - [ ] Implement evaluation and text generation
 - [ ] Implement metric generation
