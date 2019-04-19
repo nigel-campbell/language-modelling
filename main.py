@@ -2,6 +2,7 @@ import torch
 import argparse
 import model
 import data
+import csv
 
 description = """
 Custom driver for evaluating various neural
@@ -37,4 +38,11 @@ if verbose:
 lm = model.Model(vocab_size, embed_size, nhidden, nlayers, model=model)
 lm = lm.to(device)
 losses = lm.fit(corpus, epochs)
+
+with open('loss.csv') as f:
+    writer = csv.writer(f)
+    for loss in losses:
+        writer.writerow([loss])
+    
+
 print(losses)
