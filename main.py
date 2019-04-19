@@ -39,7 +39,7 @@ lm = model.Model(vocab_size, embed_size, nhidden, nlayers, model=model)
 lm = lm.to(device)
 losses = lm.fit(corpus, epochs)
 
-with open('loss.csv') as f:
+with open('loss.csv', 'w') as f:
     writer = csv.writer(f)
     for loss in losses:
         writer.writerow([loss])

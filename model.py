@@ -12,7 +12,7 @@ def batch(data, i, length):
 
 class Model(nn.Module):
         
-    def __init__(self, vocab_size, embed_size, nhidden, nlayers, model='LSTM'):
+    def __init__(self, vocab_size, embed_size, nhidden, nlayers, model='LSTM', cuda=False):
         super(Model, self).__init__()
         self.encoder = nn.Embedding(vocab_size, embed_size)
         if model == 'LSTM':
@@ -26,6 +26,7 @@ class Model(nn.Module):
         self.nhidden = nhidden
         self.nlayers = nlayers
         self.model = model
+        self.device = torch.device("cpu" if not cuda else "cuda")
 
     def forward(self, x, h0):
         y = self.encoder(x)
@@ -49,7 +50,8 @@ class Model(nn.Module):
         return map(lambda x: to_word(x, corpus), data)
 
     def init_hidden(self, batch_size):
-        h0 = torch.zeros((self.nlayers, batch_size, self.nhidden))
+        h0 = torch.zeros((self.nlayers, batch_size, self.nhidden),
+                device=self.device)
         if self.model == 'LSTM':
             return (h0, h0)
         return h0
@@ -71,8 +73,8 @@ class Model(nn.Module):
         for i in range(start, length-seq_length, seq_length):
             self.zero_grad()
             source, targets = batch(data, i, seq_length)
-            source = source.to(torch.long)
-            hidden = self.init_hidden(source.size(0))
+            source = source.to(torch.long).to(self.device)
+            hidden = self.init_hidden(source.size(0)).to(self.device)
             output, hidden = self(source, hidden)
             output = output.squeeze()
             loss = criterion(output, targets)
