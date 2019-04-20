@@ -35,7 +35,7 @@ class Model(nn.Module):
 
     def batch(self, data, i, length):
         source = data[i:i+length].to(torch.long).to(self.device)
-        target = data[i+1:i+length+1].to(torch.long) 
+        target = data[i+1:i+length+1].to(torch.long).to(self.device) 
         return source, target
 
     '''

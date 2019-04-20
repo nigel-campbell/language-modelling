@@ -16,7 +16,7 @@ parser.add_argument('--arch', type=str, default='LSTM', help='Model arch (RNN,LS
 parser.add_argument('--emsize', type=int, default=200, help='embedding size')
 parser.add_argument('--nhidden', type=int, default=10, help='number hidden')
 parser.add_argument('--nlayers', type=int, default=2, help='number of layers' )
-parser.add_argument('--epochs', type=int, default=100, help='number of epochs')
+parser.add_argument('--epochs', type=int, default=15, help='number of epochs')
 parser.add_argument('--metrics', type=str, default='metrics/', help='directory for storing metrics.')
 parser.add_argument('--mdout', type=str, default='model.pt', help='file output of serialized model')
 parser.add_argument('--verbose', action='store_true', help='Enables verbose output.')
