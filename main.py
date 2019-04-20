@@ -52,4 +52,6 @@ if not os.path.exists(metrics_dir):
 
 lm.metrics.save()
 sentence = lm.generate("Make", corpus)
+print(sentence)
+
 torch.save(lm, model_out)
