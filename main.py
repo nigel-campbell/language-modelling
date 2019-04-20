@@ -51,7 +51,5 @@ if not os.path.exists(metrics_dir):
     os.makedirs(metrics_dir)
 
 lm.metrics.save()
-with open(model_out,'wb') as f:
-    torch.save(lm, f)
-
 sentence = lm.generate("Make", corpus)
+torch.save(lm, model_out)

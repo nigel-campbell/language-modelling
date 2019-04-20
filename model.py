@@ -100,7 +100,7 @@ class Model(nn.Module):
         for word in words.split():
             x0 = self.seq2ix(word, corpus)
             batch_size = x0.size(0)
-            h0 = torch.zeros((self.nlayers, batch_size, self.nhidden))
+            h0 = self.init_hidden(batch_size)
             x1, h1 = self(x0, h0)
             word = torch.multinomial(x1.div(temperature).exp(), 1).squeeze()
             sentence.extend(self.ix2word([word], corpus))
