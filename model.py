@@ -4,11 +4,6 @@ import torch.nn.functional as F
 import data
 from metrics import Metrics
 
-def batch(data, i, length):
-    source = data[i:i+length]
-    target = data[i+1:i+length+1].to(torch.long) 
-    return source, target
-
 
 class Model(nn.Module):
         
@@ -36,6 +31,12 @@ class Model(nn.Module):
         y, h1 = self.rnn(y, h0)
         y = self.decoder(y)
         return y, h1
+
+
+    def batch(self, data, i, length):
+        source = data[i:i+length].to(torch.long).to(self.device)
+        target = data[i+1:i+length+1].to(torch.long) 
+        return source, target
 
     '''
     Converts sequence to tensor.
@@ -74,8 +75,7 @@ class Model(nn.Module):
         iterations = 1
         for i in range(start, length-seq_length, seq_length):
             self.zero_grad()
-            source, targets = batch(data, i, seq_length)
-            source = source.to(torch.long).to(self.device)
+            source, targets = self.batch(data, i, seq_length)
             hidden = self.init_hidden(source.size(0)).to(self.device)
             output, hidden = self(source, hidden)
             output = output.squeeze()

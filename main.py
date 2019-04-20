@@ -3,6 +3,7 @@ import argparse
 import model
 import data
 import csv
+import os
 from metrics import Metrics
 
 description = """
@@ -10,7 +11,7 @@ Custom driver for evaluating various neural
 architectures for generative language models.
 """
 parser = argparse.ArgumentParser(description=description)
-parser.add_argument('--data', type=str, required=True, help='location of the data corpus')
+parser.add_argument('--data', type=str, default='data/2013.txt', help='location of the data corpus')
 parser.add_argument('--arch', type=str, default='LSTM', help='Model arch (RNN,LSTM,GRU)')
 parser.add_argument('--emsize', type=int, default=200, help='embedding size')
 parser.add_argument('--nhidden', type=int, default=10, help='number hidden')
@@ -41,10 +42,16 @@ device = torch.device("cpu" if not cuda else "cuda")
 
 lm = model.Model(vocab_size, embed_size, nhidden, nlayers, model=model, cuda=cuda)
 lm = lm.to(device)
-losses = lm.fit(corpus, epochs)
-lm.metrics.save()
+try:
+    losses = lm.fit(corpus, epochs)
+except KeyboardInterrupt:
+    print("Interrupting training.")
 
-with open(mdout,'wb') as f:
+if not os.path.exists(metrics_dir):
+    os.makedirs(metrics_dir)
+
+lm.metrics.save()
+with open(model_out,'wb') as f:
     torch.save(lm, f)
 
 sentence = lm.generate("Make", corpus)
