@@ -1,6 +1,7 @@
 # Neural Language Models
 
-A repo for exploring neural language models. 
+A repo for exploring neural language models utilizing the corpus of Trump
+Tweets.
 
 ## Usage
 
@@ -16,4 +17,6 @@ python main.py --data <src>
 - [x] Validate decreasing loss
 - [ ] Implement evaluation and text generation
 - [ ] Integrate CUDA and test on ICEHAMMER
-- [ ] Implement metric generation
+- [x] Implement model persistence
+- [x] Implement metric generation
+

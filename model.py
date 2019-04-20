@@ -2,17 +2,18 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import data
-
+from metrics import Metrics
 
 def batch(data, i, length):
     source = data[i:i+length]
-    target = data[i+1:i+length+1].to(torch.long)
+    target = data[i+1:i+length+1].to(torch.long) 
     return source, target
 
 
 class Model(nn.Module):
         
-    def __init__(self, vocab_size, embed_size, nhidden, nlayers, model='LSTM', cuda=False):
+    def __init__(self, vocab_size, embed_size, nhidden, nlayers, model='LSTM',
+            cuda=False, metrics=Metrics('metrics'), verbose=False):
         super(Model, self).__init__()
         self.encoder = nn.Embedding(vocab_size, embed_size)
         if model == 'LSTM':
@@ -27,6 +28,7 @@ class Model(nn.Module):
         self.nlayers = nlayers
         self.model = model
         self.device = torch.device("cpu" if not cuda else "cuda")
+        self.metrics = metrics
 
     def forward(self, x, h0):
         y = self.encoder(x)
@@ -85,21 +87,21 @@ class Model(nn.Module):
         return total_loss / iterations
 
     def fit(self, corpus, epochs, seq_length = 15, cuda=False):
-        loss_history = []
         print("Running for {} epochs".format(epochs))
         for epoch in range(epochs):
             loss = self._train(corpus, seq_length)
             print("Loss {}, Epoch {}".format(loss, epoch))
-            loss_history.append(loss)
-        return loss_history
+            self.metrics.loss_history.append(loss)
+        return self.metrics.loss_history
 
-    def generate(self, words, corpus, batch_size, temperature=1):
+
+    def generate(self, words, corpus, batch_size=15, temperature=1):
         sentence = []
         for word in words.split():
-            x0 = seq2ix(word, corpus)
+            x0 = self.seq2ix(word, corpus)
             batch_size = x0.size(0)
             h0 = torch.zeros((self.nlayers, batch_size, self.nhidden))
             x1, h1 = self(x0, h0)
             word = torch.multinomial(x1.div(temperature).exp(), 1).squeeze()
-            sentence.extend(ix2word([word], corpus))
+            sentence.extend(self.ix2word([word], corpus))
         return ' '.join(sentence)
