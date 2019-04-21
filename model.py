@@ -127,14 +127,14 @@ class Model(nn.Module):
     Same as training except without gradient descent.
     '''
     def evaluate(self, data, corpus, seq_length, lookahead):
-        model.eval()
+        self.eval()
+        criterion=nn.CrossEntropyLoss()
         total_loss = 0.
         ntokens = len(corpus)
         iterations = 1
-        hidden = self.init_hidden(eval_batch_size)
+        length = data.size(0)
         with torch.no_grad():
-            for i in range(start, length-seq_length, seq_length):
-                self.zero_grad()
+            for i in range(0, length-seq_length, seq_length):
                 sources = self.batch(data, i, seq_length, lookahead)
                 for step in range(lookahead):
                     source, target = sources[step], sources[step+1]
