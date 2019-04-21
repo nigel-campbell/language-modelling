@@ -43,7 +43,7 @@ class Model(nn.Module):
     '''
     def seq2ix(self, seq, corpus):
         sequence = [corpus.word2ix[val] for val in seq.split()]
-        return torch.tensor(sequence)
+        return torch.tensor(sequence).to(self.device)
 
     '''
     Converts tensor output to actual words.
@@ -76,7 +76,7 @@ class Model(nn.Module):
         for i in range(start, length-seq_length, seq_length):
             self.zero_grad()
             source, targets = self.batch(data, i, seq_length)
-            hidden = self.init_hidden(source.size(0)).to(self.device)
+            hidden = self.init_hidden(source.size(0))
             output, hidden = self(source, hidden)
             output = output.squeeze()
             loss = criterion(output, targets)
@@ -102,6 +102,7 @@ class Model(nn.Module):
             batch_size = x0.size(0)
             h0 = self.init_hidden(batch_size)
             x1, h1 = self(x0, h0)
+            x1 = x1.squeeze()
             word = torch.multinomial(x1.div(temperature).exp(), 1).squeeze()
             sentence.extend(self.ix2word([word], corpus))
         return ' '.join(sentence)
