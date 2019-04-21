@@ -68,14 +68,14 @@ class Model(nn.Module):
     CPU times: user 2min 45s, sys: 40.5 s, total: 3min 26s
     Definitely needs to be trained on ICEHAMMER GPUs.
     '''
-    def _train(self, corpus, seq_length, criterion=nn.CrossEntropyLoss(), lr=0.01, momentum=0.9, lookahead=2, start = 0):
+    def _train(self, corpus, data, seq_length, criterion=nn.CrossEntropyLoss(),
+            lr=0.01, momentum=0.9, lookahead=2):
         self.train() # Sets the module in training mode.
         optimizer = torch.optim.SGD(self.parameters(), lr=lr, momentum=momentum)
         total_loss = 0.
-        data = corpus.data
         length = data.size(0)
         iterations = 1
-        for i in range(start, length-seq_length, seq_length):
+        for i in range(0, length-seq_length, seq_length):
             self.zero_grad()
             sources = self.batch(data, i, seq_length, lookahead)
             for step in range(lookahead):
@@ -90,12 +90,21 @@ class Model(nn.Module):
             optimizer.step()
         return total_loss / iterations
 
-    def fit(self, corpus, epochs, lookahead, seq_length = 15, cuda=False):
-        print("Running for {} epochs".format(epochs))
+    def fit(self, corpus, epochs, lookahead, seq_length = 15):
+        print("Running for {} epochs at lookahead of {} steps".format(epochs,lookahead))
+        data = corpus.data
+        train_size = int(len(data) * 0.7)
+        test_size = int(len(data) * 0.2)
+
+        train = corpus.data[:train_size]
+        test = corpus.data[train_size:train_size + test_size]
+        validate = corpus.data[train_size + test_size:]
         for epoch in range(epochs):
-            loss = self._train(corpus, seq_length, lookahead=lookahead)
-            print("Loss {}, Epoch {}".format(loss, epoch))
-            self.metrics.loss_history.append(loss)
+            train_loss = self._train(corpus, train, seq_length, lookahead=lookahead)
+            self.metrics.loss_history.append(train_loss)
+            val_loss = self.evaluate(validate, corpus, seq_length, lookahead) 
+            print("Train Loss {}, Validate Loss {} Epoch {}".format(train_loss,
+                val_loss, epoch))
         return self.metrics.loss_history
 
     
@@ -112,3 +121,28 @@ class Model(nn.Module):
             words = ' '.join(sentence)
             final_out.extend(sentence)
         return ' '.join(final_out)
+    
+    '''
+    Heavily borrows from PyTorch Language Model Example.
+    Same as training except without gradient descent.
+    '''
+    def evaluate(self, data, corpus, seq_length, lookahead):
+        model.eval()
+        total_loss = 0.
+        ntokens = len(corpus)
+        iterations = 1
+        hidden = self.init_hidden(eval_batch_size)
+        with torch.no_grad():
+            for i in range(start, length-seq_length, seq_length):
+                self.zero_grad()
+                sources = self.batch(data, i, seq_length, lookahead)
+                for step in range(lookahead):
+                    source, target = sources[step], sources[step+1]
+                    hidden = self.init_hidden(source.size(0))
+                    output, hidden = self(source, hidden)
+                    output = output.squeeze()
+                    loss = criterion(output, target)
+                    total_loss += loss.item()
+                iterations += 1
+        return total_loss / iterations
+        
