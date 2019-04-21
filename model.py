@@ -106,7 +106,7 @@ class Model(nn.Module):
             self.metrics.val_loss.append(val_loss)
             print("Train Loss {}, Validate Loss {} Epoch {}".format(train_loss,
                 val_loss, epoch))
-        return self.metrics.loss_history
+        return self.metrics.train_loss
 
     
     def generate(self, words, corpus, iterations=20, temperature=0.5):

@@ -11,10 +11,10 @@ class Metrics:
     def _save(self, filename, values):
         with open('{}/{}'.format(self.directory, filename), 'w') as f:
             writer = csv.writer(f)
-            for value in self.loss_history:
+            for value in values:
                 writer.writerow([value])
 
     def save(self):
-       _save("train_loss.csv", self.train_loss)
-       _save("val_loss.csv", self.val_loss)
-       _save("test_loss.csv", self.test_loss)
+       self._save("train_loss.csv", self.train_loss)
+       self._save("val_loss.csv", self.val_loss)
+       self._save("test_loss.csv", self.test_loss)
