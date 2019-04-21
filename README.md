@@ -15,8 +15,10 @@ python main.py --data <src>
 - [x] Define basic RNN/LSTM architecture and model
 - [x] Implement model training
 - [x] Validate decreasing loss
-- [ ] Implement evaluation and text generation
+- [x] Implement text generation
+- [ ] Implement evaluation on test and validation sets
+- [ ] Implement new multi-loss optimization
 - [x] Integrate CUDA and test on ICEHAMMER
-- [x] Implement model persistence
+- [ ] Implement model persistence
 - [x] Implement metric generation
 

@@ -94,15 +94,17 @@ class Model(nn.Module):
             self.metrics.loss_history.append(loss)
         return self.metrics.loss_history
 
-
-    def generate(self, words, corpus, batch_size=15, temperature=1):
-        sentence = []
-        for word in words.split():
-            x0 = self.seq2ix(word, corpus)
+    
+    def generate(self, words, corpus, iterations=20, temperature=0.5):
+        final_out = []
+        for i in range(iterations):
+            x0 = self.seq2ix(words, corpus)
             batch_size = x0.size(0)
             h0 = self.init_hidden(batch_size)
             x1, h1 = self(x0, h0)
-            x1 = x1.squeeze()
-            word = torch.multinomial(x1.div(temperature).exp(), 1).squeeze()
-            sentence.extend(self.ix2word([word], corpus))
-        return ' '.join(sentence)
+            x1 = x1.squeeze().div(temperature).exp()
+            values = torch.multinomial(x1, 1).squeeze()
+            sentence = self.ix2word(values, corpus)
+            words = ' '.join(sentence)
+            final_out.extend(sentence)
+        return ' '.join(final_out)
