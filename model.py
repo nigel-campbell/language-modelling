@@ -33,11 +33,13 @@ class Model(nn.Module):
         return y, h1
 
 
-    def batch(self, data, i, length):
-        source = data[i:i+length].to(torch.long).to(self.device)
-        target = data[i+1:i+length+1].to(torch.long).to(self.device) 
-        return source, target
-
+    def batch(self, data, i, length, lookahead):
+        sources = []
+        for j in range(lookahead+1):
+            source = data[i+j:i+length+j].to(torch.long).to(self.device)
+            sources.append(source)
+        return sources
+    
     '''
     Converts sequence to tensor.
     '''
@@ -66,7 +68,7 @@ class Model(nn.Module):
     CPU times: user 2min 45s, sys: 40.5 s, total: 3min 26s
     Definitely needs to be trained on ICEHAMMER GPUs.
     '''
-    def _train(self, corpus, seq_length, criterion=nn.CrossEntropyLoss(), lr=0.01, momentum=0.9, start = 0):
+    def _train(self, corpus, seq_length, criterion=nn.CrossEntropyLoss(), lr=0.01, momentum=0.9, lookahead=2, start = 0):
         self.train() # Sets the module in training mode.
         optimizer = torch.optim.SGD(self.parameters(), lr=lr, momentum=momentum)
         total_loss = 0.
@@ -75,12 +77,14 @@ class Model(nn.Module):
         iterations = 1
         for i in range(start, length-seq_length, seq_length):
             self.zero_grad()
-            source, targets = self.batch(data, i, seq_length)
-            hidden = self.init_hidden(source.size(0))
-            output, hidden = self(source, hidden)
-            output = output.squeeze()
-            loss = criterion(output, targets)
-            total_loss += loss.item()
+            sources = self.batch(data, i, seq_length, lookahead)
+            for step in range(lookahead):
+                source, target = sources[step], sources[step+1]
+                hidden = self.init_hidden(source.size(0))
+                output, hidden = self(source, hidden)
+                output = output.squeeze()
+                loss = criterion(output, target)
+                total_loss += loss.item()
             iterations += 1
             loss.backward() 
             optimizer.step()

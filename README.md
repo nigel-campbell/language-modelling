@@ -16,8 +16,8 @@ python main.py --data <src>
 - [x] Implement model training
 - [x] Validate decreasing loss
 - [x] Implement text generation
-- [ ] Implement evaluation on test and validation sets
 - [ ] Implement new multi-loss optimization
+- [ ] Implement evaluation on test and validation sets
 - [x] Integrate CUDA and test on ICEHAMMER
 - [ ] Implement model persistence
 - [x] Implement metric generation
