@@ -101,8 +101,9 @@ class Model(nn.Module):
         validate = corpus.data[train_size + test_size:]
         for epoch in range(epochs):
             train_loss = self._train(corpus, train, seq_length, lookahead=lookahead)
-            self.metrics.loss_history.append(train_loss)
+            self.metrics.train_loss.append(train_loss)
             val_loss = self.evaluate(validate, corpus, seq_length, lookahead) 
+            self.metrics.val_loss.append(val_loss)
             print("Train Loss {}, Validate Loss {} Epoch {}".format(train_loss,
                 val_loss, epoch))
         return self.metrics.loss_history
