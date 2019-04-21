@@ -90,10 +90,10 @@ class Model(nn.Module):
             optimizer.step()
         return total_loss / iterations
 
-    def fit(self, corpus, epochs, seq_length = 15, cuda=False):
+    def fit(self, corpus, epochs, lookahead, seq_length = 15, cuda=False):
         print("Running for {} epochs".format(epochs))
         for epoch in range(epochs):
-            loss = self._train(corpus, seq_length)
+            loss = self._train(corpus, seq_length, lookahead=lookahead)
             print("Loss {}, Epoch {}".format(loss, epoch))
             self.metrics.loss_history.append(loss)
         return self.metrics.loss_history

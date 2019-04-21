@@ -17,6 +17,7 @@ parser.add_argument('--emsize', type=int, default=200, help='embedding size')
 parser.add_argument('--nhidden', type=int, default=10, help='number hidden')
 parser.add_argument('--nlayers', type=int, default=2, help='number of layers' )
 parser.add_argument('--epochs', type=int, default=15, help='number of epochs')
+=parser.add_argument('--lookahead', type=int, default=2, help='lookahead steps')
 parser.add_argument('--metrics', type=str, default='metrics/', help='directory for storing metrics.')
 parser.add_argument('--mdout', type=str, default='model.pt', help='file output of serialized model')
 parser.add_argument('--verbose', action='store_true', help='Enables verbose output.')
@@ -33,6 +34,7 @@ metrics_dir = args.metrics
 model_out = args.mdout
 arch = args.arch
 cuda = args.cuda
+lookahead = args.lookahead
 
 corpus = data.Corpus(path, verbose)
 
@@ -43,7 +45,7 @@ device = torch.device("cpu" if not cuda else "cuda")
 lm = model.Model(vocab_size, embed_size, nhidden, nlayers, model=model, cuda=cuda)
 lm = lm.to(device)
 try:
-    losses = lm.fit(corpus, epochs)
+    losses = lm.fit(corpus, epochs, lookahead)
 except KeyboardInterrupt:
     print("Interrupting training.")
 
