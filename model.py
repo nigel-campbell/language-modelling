@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import data
 from metrics import Metrics
+import time
 
 
 class Model(nn.Module):
@@ -100,12 +101,16 @@ class Model(nn.Module):
         test = corpus.data[train_size:train_size + test_size]
         validate = corpus.data[train_size + test_size:]
         for epoch in range(epochs):
+            start = time.time()
             train_loss = self._train(corpus, train, seq_length, lookahead=lookahead)
+            end = time.time()
             self.metrics.train_loss.append(train_loss)
             val_loss = self.evaluate(validate, corpus, seq_length, lookahead) 
             self.metrics.val_loss.append(val_loss)
-            print("Train Loss {}, Validate Loss {} Epoch {}".format(train_loss,
-                val_loss, epoch))
+            
+            epoch_time = end - start
+            print("Train Loss {}, Validate Loss {}, Time {}, Epoch {}".format(train_loss,
+                val_loss, epoch_time, epoch))
         return self.metrics.train_loss
 
     
