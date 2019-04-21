@@ -42,7 +42,7 @@ vocab_size = len(corpus)
 
 device = torch.device("cpu" if not cuda else "cuda")
 
-lm = model.Model(vocab_size, embed_size, nhidden, nlayers, model=model, cuda=cuda)
+lm = model.Model(vocab_size, embed_size, nhidden, nlayers, model=model, cuda=cuda, metrics=Metrics(metrics_dir))
 lm = lm.to(device)
 try:
     losses = lm.fit(corpus, epochs, lookahead)
