@@ -51,7 +51,10 @@ if not os.path.exists(metrics_dir):
     os.makedirs(metrics_dir)
 
 lm.metrics.save()
-sentence = lm.generate("Make", corpus)
+sentence = lm.generate("Make America", corpus)
 print(sentence)
 
-torch.save(lm, model_out)
+try:
+  torch.save(lm, model_out)
+except:
+  print("Torch failed to serialize the model and I don't know why...") 
