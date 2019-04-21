@@ -57,6 +57,6 @@ sentence = lm.generate("Make America", corpus)
 print(sentence)
 
 try:
-  torch.save(lm, model_out)
+  torch.save(lm.state_dict(), model_out)
 except:
   print("Torch failed to serialize the model and I don't know why...") 
