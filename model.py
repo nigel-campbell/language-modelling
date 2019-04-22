@@ -14,6 +14,8 @@ class Model(nn.Module):
         self.encoder = nn.Embedding(vocab_size, embed_size)
         if model == 'LSTM':
             self.rnn = nn.LSTM(embed_size, nhidden, nlayers)
+        elif model == 'GRU':
+            self.rnn = nn.GRU(embed_size, nhidden, nlayers)
         else:
             self.rnn = nn.RNN(embed_size, nhidden, nlayers)
         self.decoder = nn.Linear(nhidden, vocab_size)
