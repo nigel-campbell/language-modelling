@@ -1,2 +1,0 @@
-# Used to produce baseline measure.
-python main.py --epoch 15 --cuda --lookahead 1 --metrics baseline --data data/full_dataset.txt

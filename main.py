@@ -15,6 +15,8 @@ parser.add_argument('--data', type=str, default='data/2013.txt', help='location 
 parser.add_argument('--arch', type=str, default='LSTM', help='Model arch (RNN,LSTM,GRU)')
 parser.add_argument('--emsize', type=int, default=200, help='embedding size')
 parser.add_argument('--nhidden', type=int, default=10, help='number hidden')
+parser.add_argument('--lr', type=float, default=0.01, help='learning rate')
+parser.add_argument('--seqlen', type=int, default=15, help='sequence length')
 parser.add_argument('--nlayers', type=int, default=2, help='number of layers' )
 parser.add_argument('--epochs', type=int, default=15, help='number of epochs')
 parser.add_argument('--lookahead', type=int, default=2, help='number of lookahead steps')
@@ -35,6 +37,8 @@ model_out = args.mdout
 arch = args.arch
 cuda = args.cuda
 lookahead = args.lookahead
+seqlen = args.seqlen
+lr = args.lr
 
 corpus = data.Corpus(path, verbose)
 
@@ -45,7 +49,7 @@ device = torch.device("cpu" if not cuda else "cuda")
 lm = model.Model(vocab_size, embed_size, nhidden, nlayers, model=model, cuda=cuda, metrics=Metrics(metrics_dir))
 lm = lm.to(device)
 try:
-    losses = lm.fit(corpus, epochs, lookahead)
+    losses = lm.fit(corpus, epochs, lookahead, lr, seq_length=seqlen)
 except KeyboardInterrupt:
     print("Interrupting training.")
 

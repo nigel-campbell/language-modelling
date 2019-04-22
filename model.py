@@ -91,7 +91,7 @@ class Model(nn.Module):
             optimizer.step()
         return total_loss / iterations
 
-    def fit(self, corpus, epochs, lookahead, seq_length = 15):
+    def fit(self, corpus, epochs, lookahead, lr, seq_length = 15):
         print("Running for {} epochs at lookahead of {} steps".format(epochs,lookahead))
         data = corpus.data
         train_size = int(len(data) * 0.7)
@@ -102,7 +102,7 @@ class Model(nn.Module):
         validate = corpus.data[train_size + test_size:]
         for epoch in range(epochs):
             start = time.time()
-            train_loss = self._train(corpus, train, seq_length, lookahead=lookahead)
+            train_loss = self._train(corpus, train, seq_length, lr=lr, lookahead=lookahead)
             end = time.time()
             self.metrics.train_loss.append(train_loss)
             val_loss = self.evaluate(validate, corpus, seq_length, lookahead) 
